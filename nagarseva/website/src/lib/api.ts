@@ -1,6 +1,9 @@
 import fallback from '../data/fallback.json'
 
 export type Pocket = typeof fallback.items[number] & {
+  years_since_settlement?: number
+  clinic_within_1km?: number
+  anganwadi_within_500m?: number
   shap_reasons?: { feature: string; label: string; contribution: number }[]
   intervention?: { top_options: { type: string; probability: number }[]; reasons: string[] }
   service_assurance?: Record<string, number>
@@ -80,5 +83,6 @@ export const submitComplaint = async (text: string, language: string, pocket_id:
   }, { text, language, pocket_id })
 }
 export const getComplaints = () => request<{ items: Complaint[]; total: number }>('/grievances', () => ({ items: stored(), total: stored().length }))
-export const money = (n: number) => Math.abs(n) >= 1e7 ? `₹${(n / 1e7).toFixed(1)} Cr` : `₹${(n / 1e5).toFixed(1)} L`
-export const number = (n: number) => Math.round(n).toLocaleString('en-IN')
+const currentLocale = () => document.documentElement.lang === 'hi' ? 'hi-IN' : document.documentElement.lang === 'mr' ? 'mr-IN' : 'en-IN'
+export const money = (n: number) => Math.abs(n) >= 1e7 ? `₹${(n / 1e7).toLocaleString(currentLocale(), { maximumFractionDigits: 1 })} Cr` : `₹${(n / 1e5).toLocaleString(currentLocale(), { maximumFractionDigits: 1 })} L`
+export const number = (n: number) => Math.round(n).toLocaleString(currentLocale())
